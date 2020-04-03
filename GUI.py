@@ -1,3 +1,5 @@
+from tkinter import *
+from tkinter import filedialog, messagebox as mb
 import numpy as np
 from PIL import Image, ImageTk
 import matplotlib.pyplot as plt
@@ -220,3 +222,36 @@ class ImagePro(object):
             image = image.resize((new_size_x, new_size_y))
         return image
         
+
+
+class MainWindow(Tk):
+    def __init__(self, *args, **kwargs):
+        return Tk.__init__(self, *args, **kwargs)
+
+    def add_widget_to_grid(self, widget, row, column, **kwargs):
+        w=widget(self, **kwargs)
+        w.grid(row=row, column=column)
+        return w
+    @staticmethod
+    def detect_stone_from_img():
+        file_path = filedialog.askopenfilename()
+        recognizer = ImagePro(file_path)
+        try:
+            recognizer.get_marking_param()
+            recognizer.mark_found_objects()
+            num_found=len(recognizer.found_list)
+            img_count.config(text="number of stones found = "+str(num_found))
+            initial_img_label.config(image=recognizer.tk_image)
+            initial_img_label.photo = recognizer.tk_image
+            final_img_label.config(image=recognizer.marked_tk_image)
+            final_img_label.photo = recognizer.marked_tk_image
+        except:
+            mb.showerror('Error Occured', 'An error occured while trying to detect object in the image uploaded, try another image')
+        
+
+win=MainWindow()
+win.add_widget_to_grid(Button, 0, 0, text='Choose Image', command=MainWindow.detect_stone_from_img)
+img_count = win.add_widget_to_grid(Label, 0, 1, fg='green')
+initial_img_label = win.add_widget_to_grid(Label, 1, 0)
+final_img_label = win.add_widget_to_grid(Label, 1, 1)
+win.mainloop()
